@@ -1,23 +1,46 @@
-import 'babel-polyfill';
-import React from 'react';
-import ReactDOM from "react-dom";
-import {Provider} from 'react-redux';
-import {createStore, applyMiddleware} from 'redux';
-import thunk from 'redux-thunk';
-import promise from 'redux-promise';
-import createLogger from 'redux-logger';
-import allReducers from './reducers';
-import App from './components/App';
+import { combineReducers, createStore } from 'redux';
 
-const logger = createLogger();
-const store = createStore(
-    allReducers,
-    applyMiddleware(thunk, promise, logger)
-);
+//Reducer takes a state & action then returns a new state
+//Each normally in their own file
+const userReducer = function(state={}, action){
+  switch(action.type){
+    case 'CHANGE_NAME': {
+      state = {...state, name: action.payload}
+      break;
+    }
+    case 'CHANGE_AGE': {
+      state = {...state, age: action.payload}
+      break;
+    }
+  }
+  return state;
+};
 
-ReactDOM.render(
-    <Provider store={store}>
-        <App />
-    </Provider>,
-    document.getElementById('root')
-);
+const tweetsReducer = function(state=[], action){
+  return state;
+};
+
+const reducers = combineReducers({
+  user: userReducer,
+  tweets: tweetsReducer
+});
+
+const store = createStore(reducers, {
+  user: {
+    name: 'Aaron',
+    age: 26
+  },
+  tweets: []
+});
+
+
+
+store.subscribe(() => {
+  console.log('store changed', store.getState())
+});
+
+//Actions
+store.dispatch({type: 'DEFAULT', payload: ''});
+store.dispatch({type: 'CHANGE_NAME', payload: 'Tbo'});
+store.dispatch({type: 'CHANGE_AGE', payload: 27});
+store.dispatch({type: 'CHANGE_AGE', payload: 28});
